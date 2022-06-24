@@ -14,6 +14,7 @@
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
+
 public class InteractivePercolationVisualizer {
 
     public static void main(String[] args) {
