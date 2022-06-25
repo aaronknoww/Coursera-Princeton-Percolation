@@ -2,6 +2,7 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation
 {  
+    //TODO: RESOLVER EL PROBLEMA DE QUE SE RESTA -1 A CADA COLUMNA Y FILA.
     private Nodo grid[][];
     private int openSites;
     private boolean percolate;
@@ -73,31 +74,29 @@ public class Percolation
     public void open(int row, int col)
     {
        checkRowsAndCol(row, col);                
-       row-=1;
-       col-=1;
-
+       
        if(isOpen(row, col)) 
             return;
         
         // Open and union this node.    
-        if(grid[row][col].top==true)
+        if(grid[row-1][col-1].top==true)
         {
-            grid[row][col].open=true;
-            grid[row][col].full=true;
-            connectNeighbor(row,col);
-            Nodo root = findNodo(union.find(grid[row][col].name));
+            grid[row-1][col-1].open=true;
+            grid[row-1][col-1].full=true;
+            connectNeighbor(row-1,col-1);
+            Nodo root = findNodo(union.find(grid[row-1][col-1].name));
             root.full=true;
             openSites++;
             return;
         }
 
-        grid[row][col].open=true;
-        connectNeighbor(row,col);
-        Nodo root = findNodo(union.find(grid[row][col].name));
+        grid[row-1][col-1].open=true;
+        connectNeighbor(row-1,col-1);
+        Nodo root = findNodo(union.find(grid[row-1][col-1].name));
         if(root.full==true)
-            grid[row][col].full=true;
+            grid[row-1][col-1].full=true;
         openSites++;
-        if(grid[row][col].full==true && grid[row][col].bottom==true)
+        if(grid[row-1][col-1].full==true && grid[row-1][col-1].bottom==true)
             percolate=true;
         return;
        
@@ -107,7 +106,7 @@ public class Percolation
     public boolean isOpen(int row, int col)
     {
         checkRowsAndCol(row, col);
-        if(grid[row][col].open==true)
+        if(grid[row-1][col-1].open==true)
         return true;
 
         return false;
@@ -118,18 +117,19 @@ public class Percolation
     public boolean isFull(int row, int col)
     {
         checkRowsAndCol(row, col);
+     
         if(!isOpen(row, col)) // If the node its close.
             return false;
 
-        if(grid[row][col].full==true)
+        if(grid[row-1][col-1].full==true)
             return true;
         else
         {
-            Nodo root = findNodo(union.find(grid[row][col].name));
+            Nodo root = findNodo(union.find(grid[row-1][col-1].name));
             if(root.full==true)
             {
-                grid[row][col].full=true;
-                percolate=(grid[row][col].bottom==true)?true:false;
+                grid[row-1][col-1].full=true;
+                percolate=(grid[row-1][col-1].bottom==true)?true:false;
                 return true;
             }
             return false;
@@ -149,9 +149,9 @@ public class Percolation
             return true;
         else
         {
-            for (int j = 0; j < rowsNCol; j++)
+            for (int j = 1; j <= rowsNCol; j++)
             {
-              if(isFull(rowsNCol-1, j))
+              if(isFull(rowsNCol, j))
                 return true;
             }
             return false;
@@ -175,18 +175,18 @@ public class Percolation
 
     private void connectNeighbor(int row, int col)
     {
-        //top
-        if( (row-1>=0) && (isOpen(row-1, col)))
+        //It has a neighbor on the top.
+        if( (row-1>=0) && (isOpen(row-1+1, col+1)))
             union.union(grid[row][col].name, grid[row-1][col].name);
-        //bottom
-        if((row+1<=rowsNCol) && (isOpen(row+1,col)))
+        //It has a neighbor at the bottom.
+        if((row+1<rowsNCol) && (isOpen(row+1+1,col+1)))
             union.union(grid[row][col].name, grid[row+1][col].name);
-        //left
-        if((col-1>=0) && (isOpen(row, col-1)))
+        //It has a neighbor at the left
+        if((col-1>=0) && (isOpen(row+1, col-1+1)))
             union.union(grid[row][col].name, grid[row][col-1].name);
-        //right
-        if((col+1<=rowsNCol) && (isOpen(row, col+1)))
-            union.union(grid[row][col].name, grid[row][col-1].name);
+        //It has a neighbor at the right
+        if((col+1<rowsNCol) && (isOpen(row+1, col+1+1)))
+            union.union(grid[row][col].name, grid[row][col+1].name);
         
     }
     private Nodo findNodo(int clave)
