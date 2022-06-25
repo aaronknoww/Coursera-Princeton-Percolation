@@ -2,7 +2,7 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation
 {  
-    //TODO: RESOLVER EL PROBLEMA DE QUE SE RESTA -1 A CADA COLUMNA Y FILA.
+  
     private Nodo grid[][];
     private int openSites;
     private boolean percolate;
@@ -78,26 +78,19 @@ public class Percolation
        if(isOpen(row, col)) 
             return;
         
-        // Open and union this node.    
+        //Open and union this node.    
         if(grid[row-1][col-1].top==true)
         {
             grid[row-1][col-1].open=true;
             grid[row-1][col-1].full=true;
             connectNeighbor(row-1,col-1);
-            Nodo root = findNodo(union.find(grid[row-1][col-1].name));
-            root.full=true;
             openSites++;
             return;
         }
 
         grid[row-1][col-1].open=true;
-        connectNeighbor(row-1,col-1);
-        Nodo root = findNodo(union.find(grid[row-1][col-1].name));
-        if(root.full==true)
-            grid[row-1][col-1].full=true;
         openSites++;
-        if(grid[row-1][col-1].full==true && grid[row-1][col-1].bottom==true)
-            percolate=true;
+        connectNeighbor(row-1,col-1);
         return;
        
     }
@@ -157,36 +150,52 @@ public class Percolation
             return false;
         }
     }
-    
-    // // // test client (optional)
-    // // public static void main(String[] args)
-
+ 
     ////////////////////////////////////////////////////////////////////////
     //                      PRIVATE FUNCIONS                             //
     ////////////////////////////////////////////////////////////////////// 
 
     private void checkRowsAndCol(int row, int col)
     {
-        if (row<1) 
+        if (row < 1)
             throw new IndexOutOfBoundsException("The number of rows must be greater than 0");
-        if(col<1)
+        if (col < 1)
             throw new IndexOutOfBoundsException("The number of columns must be greater than 0");
+        if (row > rowsNCol)
+            throw new IndexOutOfBoundsException("The number of rows must be lower than:" + rowsNCol);
+        if (col > rowsNCol)
+            throw new IndexOutOfBoundsException("The number of columns must be lower than:" + rowsNCol);
     }
 
     private void connectNeighbor(int row, int col)
     {
         //It has a neighbor on the top.
         if( (row-1>=0) && (isOpen(row-1+1, col+1)))
+        {
             union.union(grid[row][col].name, grid[row-1][col].name);
+            fillIn(grid[row][col], grid[row-1][col]);           
+        }
+
         //It has a neighbor at the bottom.
         if((row+1<rowsNCol) && (isOpen(row+1+1,col+1)))
+        {
             union.union(grid[row][col].name, grid[row+1][col].name);
+            fillIn(grid[row][col], grid[row+1][col]);           
+        }
+
         //It has a neighbor at the left
         if((col-1>=0) && (isOpen(row+1, col-1+1)))
+        {
             union.union(grid[row][col].name, grid[row][col-1].name);
+            fillIn(grid[row][col], grid[row][col-1]);           
+        }
+
         //It has a neighbor at the right
         if((col+1<rowsNCol) && (isOpen(row+1, col+1+1)))
+        {
             union.union(grid[row][col].name, grid[row][col+1].name);
+            fillIn(grid[row][col], grid[row][col+1]);           
+        }
         
     }
     private Nodo findNodo(int clave)
@@ -195,6 +204,27 @@ public class Percolation
         int columna = clave-(fila*rowsNCol);
         return grid[fila][columna];
 
+    }
+    private void fillIn(Nodo a, Nodo b)
+    {
+        
+        Nodo root = findNodo(union.find(a.name));
+        if(root.full==true)
+        {
+            a.full=true;
+            b.full=true;
+            percolate = ((a.bottom == true) || (b.bottom == true) || (root.bottom == true)) ? true : false;
+            return;          
+        }
+        else if(a.full==true || b.full==true)
+        {
+            root.full=true;
+            a.full=true;
+            b.full=true;
+            percolate = ((a.bottom == true) || (b.bottom == true) || (root.bottom == true)) ? true : false;
+            return;          
+        }
+        return;       
     }
     
     private class Nodo
