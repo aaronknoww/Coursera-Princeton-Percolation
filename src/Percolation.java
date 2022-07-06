@@ -1,5 +1,9 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
+// Aaron Knoww 
+// In order to use the column and row 0, you must subtract 1,
+// for example when you want to access the corner 1,1 you really have to enter the point 0,0.
+
 public class Percolation
 {  
   
